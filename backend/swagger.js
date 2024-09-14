@@ -7,9 +7,9 @@ const options = {
             title: 'API',
             description: "API endpoints for a mini blog services documented on swagger",
             contact: {
-                name: "Desmond Obisi",
+                name: "VIPACK",
                 email: "vanhhh59@gmail.com",
-                url: "https://github.com/vanhh59/babyboo-backend.git"
+                url: "https://github.com/vanhh59/vpack-ecomerce.git"
             },
             version: '1.0.0',
         },
@@ -25,7 +25,7 @@ const options = {
         ]
     },
     // looks for configuration in specified directories
-    apis: ['./router/*.js'],
+    apis: ['./routes/*.js']
 }
 const swaggerSpec = swaggerJsdoc(options)
 function swaggerDocs(app, port) {
