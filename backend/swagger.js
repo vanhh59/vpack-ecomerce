@@ -1,5 +1,6 @@
 import swaggerJsdoc from 'swagger-jsdoc'
 import swaggerUi from 'swagger-ui-express'
+// Swagger Options
 const options = {
     definition: {
         openapi: '3.0.0',
@@ -25,7 +26,8 @@ const options = {
         ]
     },
     // looks for configuration in specified directories
-    apis: ['./routes/*.js']
+    // đây là nơi chứa các file route cần được tạo swagger docs
+    apis: ['./backend/routes/*.js'],
 }
 const swaggerSpec = swaggerJsdoc(options)
 function swaggerDocs(app, port) {
