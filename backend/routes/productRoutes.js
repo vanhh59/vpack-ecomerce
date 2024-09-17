@@ -46,7 +46,7 @@ router.route("/").get(fetchProducts);
  * /:
  *  post:
  *    tags:
- *    - Product
+ *    - Product Controller
  *    summary: Add a new product
  *    security:
  *      - bearerAuth: []

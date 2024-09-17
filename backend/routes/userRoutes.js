@@ -83,6 +83,20 @@ router.post("/register", registerUser);
  *    responses:
  *      200:
  *        description: Successful login
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                _id:
+ *                  type: string
+ *                username:
+ *                  type: string
+ *                email:
+ *                  type: string
+ *                  format: email
+ *                isAdmin:
+ *                  type: boolean
  *      401:
  *        description: Invalid email or password
  *      404:
