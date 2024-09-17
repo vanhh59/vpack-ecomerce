@@ -23,18 +23,6 @@ const userSchema = mongoose.Schema(
       required: true,
       default: false,
     },
-
-    isStaff: {
-      type: Boolean,
-      required: true,
-      default: false,
-    },
-
-    isManager: {
-      type: Boolean,
-      required: true,
-      default: false,
-    },
   },
   { timestamps: true }
 );

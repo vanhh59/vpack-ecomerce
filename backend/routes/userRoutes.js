@@ -54,23 +54,19 @@ const router = express.Router();
  */
 router.post("/register", registerUser);
 
-// router
-//   .route("/")
-//   .post(createUser)
-//   .get(authenticate, authorizeAdmin, getAllUsers);
-
 /**
  * @openapi
  * '/api/users/auth':
  *  post:
- *     tags:
+ *    tags:
  *     - User Controller
- *     summary: Authenticate user
- *     requestBody:
+ *    summary: Login a user
+ *    description: Allows a user to login by providing email and password
+ *    requestBody:
  *      required: true
  *      content:
  *        application/json:
- *           schema:
+ *          schema:
  *            type: object
  *            required:
  *              - email
@@ -78,18 +74,23 @@ router.post("/register", registerUser);
  *            properties:
  *              email:
  *                type: string
- *                default: admin@gmail.com
+ *                format: email
+ *                example: admin@gmail.com
  *              password:
  *                type: string
- *                default: vipack
- *     responses:
+ *                format: password
+ *                example: vipack
+ *    responses:
  *      200:
- *        description: User authenticated successfully
+ *        description: Successful login
  *      401:
- *        description: Unauthorized - Invalid credentials
+ *        description: Invalid email or password
+ *      404:
+ *        description: User not found
  *      500:
  *        description: Server error
  */
+
 router.post("/auth", loginUser);
 
 /**
