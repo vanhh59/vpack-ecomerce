@@ -6,6 +6,8 @@ const generateToken = (res, userId) => {
   });
 
   // Set JWT as an HTTP-Only Cookie
+  // jwt được set trong cookie để tránh việc lưu trữ trong localStorage
+  // với việc lưu trữ trong localStorage, nếu có một lỗ hổng XSS, attacker có thể lấy được token và thực hiện các hành vi độc hại
   res.cookie("jwt", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV !== "development",

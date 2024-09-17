@@ -124,7 +124,7 @@ router.post("/logout", logoutCurrentUser);
  *      500:
  *        description: Server error
  */
-router.get("/", authenticate, getAllUsers);
+router.get("/", authenticate, authorizeAdmin, getAllUsers);
 
 /**
  * @openapi
