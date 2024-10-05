@@ -6,21 +6,42 @@ import createToken from "../utils/createToken.js";
 const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
 
+  // Ensure all required fields are filled
   if (!username || !email || !password) {
-    throw new Error("Please fill all the inputs.");
+    return res.status(400).json({ message: "Please fill all the inputs." });
   }
 
-  const userExists = await User.findOne({ email });
-  if (userExists) res.status(400).send("User already exists");
+  // Check if user already exists by email
+  const userExistsByEmail = await User.findOne({ email });
+  if (userExistsByEmail) {
+    return res.status(400).json({ message: "User with this email already exists." });
+  }
 
+  // Check if user already exists by username
+  const userExistsByUsername = await User.findOne({ username });
+  if (userExistsByUsername) {
+    return res.status(400).json({ message: "Username is already taken." });
+  }
+
+  // Hash the password before saving to the database
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
-  const newUser = new User({ username, email, password: hashedPassword });
+
+  // Create a new user object with hashed password
+  const newUser = new User({
+    username,
+    email,
+    password: hashedPassword,
+  });
 
   try {
+    // Save the new user to the database
     await newUser.save();
+
+    // Create a token for the user
     createToken(res, newUser._id);
 
+    // Send success response with user data (without password)
     res.status(201).json({
       _id: newUser._id,
       username: newUser.username,
@@ -28,8 +49,14 @@ const registerUser = asyncHandler(async (req, res) => {
       isAdmin: newUser.isAdmin,
     });
   } catch (error) {
-    res.status(400);
-    throw new Error("Invalid user data");
+    if (error.code === 11000) {
+      // Catch duplicate key error (like username or email)
+      const duplicateField = Object.keys(error.keyPattern)[0]; // Get which field caused the error
+      return res.status(400).json({ message: `${duplicateField} is already in use.` });
+    }
+
+    // Handle other errors during user creation
+    res.status(500).json({ message: "Failed to create user, please try again." });
   }
 });
 
@@ -93,6 +120,7 @@ const getCurrentUserProfile = asyncHandler(async (req, res) => {
       _id: user._id,
       username: user.username,
       email: user.email,
+      isAdmin: user.isAdmin,
     });
   } else {
     res.status(404);
@@ -119,6 +147,7 @@ const updateCurrentUserProfile = asyncHandler(async (req, res) => {
       _id: updatedUser._id,
       username: updatedUser.username,
       email: updatedUser.email,
+      password: updatedUser.password,
       isAdmin: updatedUser.isAdmin,
     });
   } else {
