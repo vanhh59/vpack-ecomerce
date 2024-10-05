@@ -15,14 +15,12 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-/** POST Methods */
-
 /**
  * @openapi
  * '/api/users/register':
  *  post:
  *     tags:
- *     - User Controller
+ *     - Auth
  *     summary: Register a new user
  *     requestBody:
  *      required: true
@@ -59,7 +57,7 @@ router.post("/register", registerUser);
  * '/api/users/auth':
  *  post:
  *    tags:
- *     - User Controller
+ *     - Auth
  *    summary: Login a user
  *    description: Allows a user to login by providing email and password
  *    requestBody:
@@ -112,7 +110,7 @@ router.post("/auth", loginUser);
  * '/api/users/logout':
  *  post:
  *     tags:
- *     - User Controller
+ *     - Auth
  *     summary: Logout the current user
  *     responses:
  *      200:
@@ -127,7 +125,7 @@ router.post("/logout", logoutCurrentUser);
  * '/api/users':
  *  get:
  *     tags:
- *     - User Controller
+ *     - Admin
  *     summary: Get all users (admin access required)
  *     security:
  *      - bearerAuth: []
@@ -146,7 +144,7 @@ router.get("/", authenticate, authorizeAdmin, getAllUsers);
  * '/api/users/profile':
  *  get:
  *     tags:
- *     - User Controller
+ *     - User
  *     summary: Get current user profile
  *     security:
  *      - bearerAuth: []
@@ -159,7 +157,7 @@ router.get("/", authenticate, authorizeAdmin, getAllUsers);
  *        description: Server error
  *  put:
  *     tags:
- *     - User Controller
+ *     - User
  *     summary: Update current user profile
  *     security:
  *      - bearerAuth: []
@@ -191,7 +189,7 @@ router
   .get(authenticate, getCurrentUserProfile)
   .put(authenticate, updateCurrentUserProfile);
 
-// ADMIN ROUTES 👇
+
 /** ADMIN ROUTES */
 
 /**
@@ -199,7 +197,7 @@ router
  * '/api/users/{id}':
  *  get:
  *     tags:
- *     - User Controller
+ *     - Admin
  *     summary: Get user by ID (admin access required)
  *     security:
  *      - bearerAuth: []
@@ -221,7 +219,7 @@ router
  *        description: Server error
  *  put:
  *     tags:
- *     - User Controller
+ *     - Admin
  *     summary: Update user by ID (admin access required)
  *     security:
  *      - bearerAuth: []
@@ -260,7 +258,7 @@ router
  *        description: Server error
  *  delete:
  *     tags:
- *     - User Controller
+ *     - Admin
  *     summary: Delete user by ID (admin access required)
  *     security:
  *      - bearerAuth: []
@@ -283,8 +281,8 @@ router
  */
 router
   .route("/:id")
-  .delete(authenticate, deleteUserById)
-  .get(authenticate, getUserById)
-  .put(authenticate, updateUserById);
+  .delete(authenticate, authorizeAdmin, deleteUserById)
+  .get(authenticate, authorizeAdmin, getUserById)
+  .put(authenticate, authorizeAdmin, updateUserById);
 
 export default router;
