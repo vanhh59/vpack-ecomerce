@@ -12,9 +12,15 @@ const registerUser = asyncHandler(async (req, res) => {
   }
 
   // Check if user already exists by email
-  const userExists = await User.findOne({ email });
-  if (userExists) {
-    return res.status(400).json({ message: "User already exists." });
+  const userExistsByEmail = await User.findOne({ email });
+  if (userExistsByEmail) {
+    return res.status(400).json({ message: "User with this email already exists." });
+  }
+
+  // Check if user already exists by username
+  const userExistsByUsername = await User.findOne({ username });
+  if (userExistsByUsername) {
+    return res.status(400).json({ message: "Username is already taken." });
   }
 
   // Hash the password before saving to the database
@@ -43,10 +49,17 @@ const registerUser = asyncHandler(async (req, res) => {
       isAdmin: newUser.isAdmin,
     });
   } catch (error) {
-    // Handle any errors during user creation
+    if (error.code === 11000) {
+      // Catch duplicate key error (like username or email)
+      const duplicateField = Object.keys(error.keyPattern)[0]; // Get which field caused the error
+      return res.status(400).json({ message: `${duplicateField} is already in use.` });
+    }
+
+    // Handle other errors during user creation
     res.status(500).json({ message: "Failed to create user, please try again." });
   }
 });
+
 
 
 const loginUser = asyncHandler(async (req, res) => {
