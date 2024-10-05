@@ -1,5 +1,6 @@
-import swaggerJsdoc from 'swagger-jsdoc'
-import swaggerUi from 'swagger-ui-express'
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
+
 // Swagger Options
 const options = {
     definition: {
@@ -15,28 +16,45 @@ const options = {
             version: '1.0.0',
         },
         servers: [
-            {
-                url: "https://vpack-ecomerce.onrender.com/",
-                description: "Live server"
-            },
+            // {
+            //     url: "https://vpack-ecomerce.onrender.com/",
+            //     description: "Live server"
+            // },
             {
                 url: "http://localhost:10000/",
                 description: "Local server"
             },
-        ]
+        ],
+        components: {
+            securitySchemes: {
+                BearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                },
+            },
+        },
+        security: [
+            {
+                BearerAuth: [],
+            },
+        ],
     },
     // looks for configuration in specified directories
-    // đây là nơi chứa các file route cần được tạo swagger docs
-    apis: ['./backend/routes/*.js'],
-}
-const swaggerSpec = swaggerJsdoc(options)
+    // Đây là nơi chứa các file route cần được tạo swagger docs
+    apis: ['./backend/routes/*.js', './backend/controllers/*.js'], // Thêm cả controller
+};
+
+const swaggerSpec = swaggerJsdoc(options);
+
 function swaggerDocs(app, port) {
     // Swagger Page
-    app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+    app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
     // Documentation in JSON format
     app.get('/docs.json', (req, res) => {
-        res.setHeader('Content-Type', 'application/json')
-        res.send(swaggerSpec)
-    })
+        res.setHeader('Content-Type', 'application/json');
+        res.send(swaggerSpec);
+    });
 }
-export default swaggerDocs
+
+export default swaggerDocs;

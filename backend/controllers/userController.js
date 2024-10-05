@@ -36,37 +36,39 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  // Log email and password for debugging purposes (optional)
+  // In email và password để debug (tùy chọn)
   console.log(email);
   console.log(password);
 
-  // Find the user by email in the database
+  // Tìm người dùng theo email trong cơ sở dữ liệu
   const existingUser = await User.findOne({ email });
 
-  // Check if the user exists
+  // Kiểm tra xem người dùng có tồn tại không
   if (existingUser) {
-    // Compare the provided password with the stored hashed password
+    // So sánh mật khẩu được cung cấp với mật khẩu đã băm lưu trữ
     const isPasswordValid = await bcrypt.compare(password, existingUser.password);
 
-    // If the password is valid, create a token and return user details
+    // Nếu mật khẩu hợp lệ, tạo token và trả về thông tin người dùng
     if (isPasswordValid) {
-      createToken(res, existingUser._id);
+      const token = createToken(res, existingUser._id); // Tạo token tại đây
 
       res.status(200).json({
         _id: existingUser._id,
         username: existingUser.username,
         email: existingUser.email,
         isAdmin: existingUser.isAdmin,
+        token, // Thêm token vào response
       });
     } else {
-      // If the password is incorrect, return a 401 Unauthorized response
-      res.status(401).json({ message: "Invalid email or password" });
+      // Nếu mật khẩu không hợp lệ, trả về phản hồi 401 Unauthorized
+      res.status(401).json({ message: "Email hoặc mật khẩu không hợp lệ" });
     }
   } else {
-    // If no user is found, return a 404 Not Found response
-    res.status(404).json({ message: "User not found" });
+    // Nếu không tìm thấy người dùng, trả về phản hồi 404 Not Found
+    res.status(404).json({ message: "Người dùng không tồn tại" });
   }
 });
+
 
 
 const logoutCurrentUser = asyncHandler(async (req, res) => {
