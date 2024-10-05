@@ -102,7 +102,6 @@ router.post("/register", registerUser);
  *      500:
  *        description: Server error
  */
-
 router.post("/auth", loginUser);
 
 /**
@@ -155,43 +154,48 @@ router.get("/", authenticate, authorizeAdmin, getAllUsers);
  *        description: Unauthorized
  *      500:
  *        description: Server error
- *  put:
- *     tags:
- *     - User
- *     summary: Update current user profile
- *     security:
- *      - bearerAuth: []
- *     requestBody:
- *      required: true
- *      content:
- *        application/json:
- *           schema:
- *            type: object
- *            properties:
- *              username:
- *                type: string
- *              email:
- *                type: string
- *              password:
- *                type: string
- *     responses:
- *      200:
- *        description: User profile updated successfully
- *      400:
- *        description: Bad request
- *      401:
- *        description: Unauthorized
- *      500:
- *        description: Server error
  */
 router
   .route("/profile")
-  .get(authenticate, getCurrentUserProfile)
+  .get(authenticate, getCurrentUserProfile);
+
+/**
+* @openapi
+* '/api/users/profile':
+*  put:
+*     tags:
+*     - User
+*     summary: Update current user profile
+*     security:
+*      - bearerAuth: []
+*     requestBody:
+*      required: true
+*      content:
+*        application/json:
+*           schema:
+*            type: object
+*            properties:
+*              username:
+*                type: string
+*              email:
+*                type: string
+*              password:
+*                type: string
+*     responses:
+*      200:
+*        description: User profile updated successfully
+*      400:
+*        description: Bad request
+*      401:
+*        description: Unauthorized
+*      500:
+*        description: Server error
+*/
+router.route("/profile")
   .put(authenticate, updateCurrentUserProfile);
 
 
 /** ADMIN ROUTES */
-
 /**
  * @openapi
  * '/api/users/{id}':
