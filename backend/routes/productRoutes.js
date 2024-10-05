@@ -259,8 +259,8 @@ router.get("/new", fetchNewProducts);
  * /api/products/{id}:
  *   get:
  *     tags:
- *       - Products
- *     summary: Get a product by ID
+ *       - Admin
+ *     summary: Get a product by ID (admin access required)
  *     parameters:
  *       - name: id
  *         in: path
@@ -277,8 +277,8 @@ router.get("/new", fetchNewProducts);
  *         description: Server error
  *   put:
  *     tags:
- *       - Products
- *     summary: Update a product by ID
+ *       - Admin
+ *     summary: Update a product by ID (admin access required)
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -320,8 +320,8 @@ router.get("/new", fetchNewProducts);
  *         description: Server error
  *   delete:
  *     tags:
- *       - Products
- *     summary: Delete a product by ID
+ *       - Admin
+ *     summary: Delete a product by ID (admin access required)
  *     security:
  *       - bearerAuth: []
  *     parameters:

@@ -116,7 +116,7 @@ const fetchProductById = asyncHandler(async (req, res) => {
     console.error(error);
     res.status(404).json({ error: "Product not found" });
   }
-});
+}); // hàm này trả về một sản phẩm dựa trên id
 
 const fetchAllProducts = asyncHandler(async (req, res) => {
   try {
