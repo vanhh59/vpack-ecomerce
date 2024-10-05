@@ -2,12 +2,12 @@ import mongoose from "mongoose";
 
 const userSchema = mongoose.Schema(
   {
-    username: {
+    name: {
       type: String,
       required: true,
     },
 
-    email: {
+    username: {
       type: String,
       required: true,
       unique: true,
@@ -21,7 +21,7 @@ const userSchema = mongoose.Schema(
     isAdmin: {
       type: Boolean,
       required: true,
-      default: false,
+      default: false, // By default, the user is not an admin
     },
   },
   { timestamps: true }
