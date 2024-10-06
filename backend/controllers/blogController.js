@@ -1,5 +1,32 @@
 import Blog from "../models/blogModel.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
+import { initializeApp } from "firebase/app";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
+
+// Cấu hình Firebase
+const firebaseConfig = {
+    apiKey: process.env.FIREBASE_API_KEY,
+    authDomain: "your-app-id.firebaseapp.com",
+    projectId: "your-project-id",
+    storageBucket: "your-app-id.appspot.com",
+    messagingSenderId: "your-sender-id",
+    appId: "your-app-id"
+};
+
+const app = initializeApp(firebaseConfig);
+const storage = getStorage(app);
+
+// Hàm lấy imageUrl từ Firebase Storage
+const getImageUrl = asyncHandler(async (filePath) => {
+    try {
+        const fileRef = ref(storage, filePath);
+        const imageUrl = await getDownloadURL(fileRef);
+        return imageUrl;
+    } catch (error) {
+        console.error("Error getting image URL:", error);
+        throw new Error("Failed to retrieve image URL from Firebase");
+    }
+});
 
 /**
  * @swagger
@@ -25,7 +52,7 @@ import asyncHandler from "../middlewares/asyncHandler.js";
  *                 type: string
  *               content:
  *                 type: string
- *               imageUrl:
+ *               filePath:
  *                 type: string
  *     responses:
  *       200:
@@ -34,11 +61,14 @@ import asyncHandler from "../middlewares/asyncHandler.js";
  *         description: Invalid input
  */
 const createBlog = asyncHandler(async (req, res) => {
-    const { title, content, imageUrl } = req.body;
+    const { title, content, filePath } = req.body;
 
-    if (!title || !content || !imageUrl) {
+    if (!title || !content || !filePath) {
         return res.status(400).json({ error: "All fields are required" });
     }
+
+    // Lấy imageUrl từ Firebase dựa trên filePath
+    const imageUrl = await getImageUrl(filePath);
 
     const blog = await new Blog({ title, content, imageUrl }).save();
     res.status(201).json(blog);
@@ -66,7 +96,7 @@ const createBlog = asyncHandler(async (req, res) => {
  *                 type: string
  *               content:
  *                 type: string
- *               imageUrl:
+ *               filePath:
  *                 type: string
  *     responses:
  *       200:
@@ -75,7 +105,7 @@ const createBlog = asyncHandler(async (req, res) => {
  *         description: Blog not found
  */
 const updateBlog = asyncHandler(async (req, res) => {
-    const { title, content, imageUrl } = req.body;
+    const { title, content, filePath } = req.body;
     const { id } = req.params;
 
     const blog = await Blog.findById(id);
@@ -85,7 +115,11 @@ const updateBlog = asyncHandler(async (req, res) => {
 
     blog.title = title || blog.title;
     blog.content = content || blog.content;
-    blog.imageUrl = imageUrl || blog.imageUrl;
+
+    // Nếu có filePath mới, cập nhật imageUrl
+    if (filePath) {
+        blog.imageUrl = await getImageUrl(filePath);
+    }
 
     const updatedBlog = await blog.save();
     res.json(updatedBlog);
