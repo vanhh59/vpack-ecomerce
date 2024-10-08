@@ -13,6 +13,7 @@ import productRoutes from "./routes/productRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js"; // Import blog routes
+import Axios from "axios";
 
 dotenv.config();
 const port = process.env.PORT || 10000;
