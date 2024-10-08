@@ -96,6 +96,8 @@ const updateBlog = asyncHandler(async (req, res) => {
  * /api/blogs/{id}:
  *   delete:
  *     summary: Delete a blog
+ *     security:
+ *       - bearerAuth: []
  *     tags: [Blogs]
  *     parameters:
  *       - name: id
@@ -124,8 +126,6 @@ const deleteBlog = asyncHandler(async (req, res) => {
  * /api/blogs:
  *   get:
  *     summary: Get all blogs
-  *     security:
- *       - bearerAuth: []
  *     tags: [Blogs]
  *     responses:
  *       200:
