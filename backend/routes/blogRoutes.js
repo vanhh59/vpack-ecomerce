@@ -19,7 +19,7 @@ router.route("/")
 
 router.route("/:id")
     .get(getBlog) // Lấy blog theo ID
-    .put(authenticate, updateBlog) // Sửa blog
-    .delete(authenticate, deleteBlog); // Xóa blog
+    .put(updateBlog) // Sửa blog
+    .delete(deleteBlog); // Xóa blog
 
 export default router;
