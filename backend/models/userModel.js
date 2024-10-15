@@ -23,6 +23,7 @@ const userSchema = mongoose.Schema(
       required: true,
       default: false, // By default, the user is not an admin
     },
+
   },
   { timestamps: true }
 );

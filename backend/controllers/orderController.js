@@ -158,6 +158,7 @@ const findOrderById = async (req, res) => {
   }
 };
 
+// markOrderAsPaid function to update order as paid
 const markOrderAsPaid = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
