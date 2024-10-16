@@ -40,7 +40,7 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
  *         description: Validation error (e.g., missing or invalid data)
  */
 
-router.route("/").post(authenticate, authorizeAdmin, createCategory);
+router.route("/").post(createCategory);
 
 /**
  * @swagger
@@ -62,7 +62,7 @@ router.route("/").post(authenticate, authorizeAdmin, createCategory);
  *       200:
  *         description: Category updated
  */
-router.route("/:categoryId").put(authenticate, authorizeAdmin, updateCategory);
+router.route("/:categoryId").put(updateCategory);
 
 /**
  * @swagger
@@ -84,7 +84,7 @@ router.route("/:categoryId").put(authenticate, authorizeAdmin, updateCategory);
  *       200:
  *         description: Category removed
  */
-router.route("/:categoryId").delete(authenticate, authorizeAdmin, removeCategory);
+router.route("/:categoryId").delete(removeCategory);
 
 /**
  * @swagger

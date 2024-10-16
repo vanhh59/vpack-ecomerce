@@ -73,7 +73,7 @@ import checkId from "../middlewares/checkId.js";
  *       500:
  *         description: Internal Server Error - Failed to create product
  */
-router.route("/").post(authenticate, authorizeAdmin, formidable(), addProduct);
+router.route("/").post(addProduct);
 
 
 /**
@@ -222,7 +222,7 @@ router.route("/allproducts").get(fetchAllProducts);
  *       500:
  *         description: Server error
  */
-router.route("/:id/reviews").post(authenticate, checkId, addProductReview);
+router.route("/:id/reviews").post(checkId, addProductReview);
 
 /**
  * @openapi
@@ -342,8 +342,8 @@ router.get("/new", fetchNewProducts);
 router
   .route("/:id")
   .get(fetchProductById)
-  .put(authenticate, authorizeAdmin, formidable(), updateProductDetails)
-  .delete(authenticate, authorizeAdmin, removeProduct);
+  .put(updateProductDetails)
+  .delete(removeProduct);
 
 /**
  * @openapi

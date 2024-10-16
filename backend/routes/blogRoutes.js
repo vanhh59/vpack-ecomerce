@@ -14,7 +14,7 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
 
 // Các route cho blog
 router.route("/")
-    .post(authenticate, authorizeAdmin, createBlog) // Thêm blog
+    .post(createBlog) // Thêm blog
     .get(listBlogs); // Lấy danh sách blog
 
 router.route("/:id")
