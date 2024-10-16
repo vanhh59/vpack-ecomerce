@@ -156,8 +156,8 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
 
 router
   .route("/")
-  .post(authenticate, createOrder)
-  .get(authenticate, authorizeAdmin, getAllOrders);
+  .post(createOrder)
+  .get(getAllOrders);
 
 /**
  * @swagger
@@ -174,7 +174,7 @@ router
  *       500:
  *         description: Internal server error
  */
-router.route("/mine").get(authenticate, getUserOrders);
+router.route("/mine").get(getUserOrders);
 
 /**
  * @swagger
@@ -243,7 +243,7 @@ router.route("/total-sales-by-date").get(calcualteTotalSalesByDate);
  *       500:
  *         description: Internal server error
  */
-router.route("/:id").get(authenticate, findOrderById);
+router.route("/:id").get(findOrderById);
 
 /**
  * @swagger
@@ -285,7 +285,7 @@ router.route("/:id").get(authenticate, findOrderById);
  *       500:
  *         description: Internal server error
  */
-router.route("/:id/pay").put(authenticate, markOrderAsPaid);
+router.route("/:id/pay").put(markOrderAsPaid);
 
 /**
  * @swagger
@@ -311,6 +311,6 @@ router.route("/:id/pay").put(authenticate, markOrderAsPaid);
  */
 router
   .route("/:id/deliver")
-  .put(authenticate, authorizeAdmin, markOrderAsDelivered);
+  .put(markOrderAsDelivered);
 
 export default router;
