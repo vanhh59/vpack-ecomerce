@@ -62,6 +62,10 @@ import checkId from "../middlewares/checkId.js";
  *                 type: string
  *                 description: Image URL for the product
  *                 example: http://example.com/image.jpg
+ *               image2:
+ *                 type: string
+ *                 description: Image URL for the product
+ *                 example: http://example.com/image2.jpg
  *     responses:
  *       201:
  *         description: Product created successfully
@@ -132,6 +136,9 @@ router.route("/").post(addProduct);
  *                       image:
  *                         type: string
  *                         description: URL of the product image
+ *                       image2:
+ *                         type: string
+ *                         description: URL of an additional product image
  *                       rating:
  *                         type: number
  *                         description: The average rating of the product
@@ -266,7 +273,7 @@ router.get("/new", fetchNewProducts);
  * /api/products/{id}:
  *   get:
  *     tags:
- *       - Admin
+ *       - Products
  *     summary: Get a product by ID (admin access required)
  *     parameters:
  *       - name: id
@@ -284,7 +291,7 @@ router.get("/new", fetchNewProducts);
  *         description: Server error
  *   put:
  *     tags:
- *       - Admin
+ *       - Products
  *     summary: Update a product by ID (admin access required)
  *     security:
  *       - bearerAuth: []
@@ -327,7 +334,7 @@ router.get("/new", fetchNewProducts);
  *         description: Server error
  *   delete:
  *     tags:
- *       - Admin
+ *       - Products
  *     summary: Delete a product by ID (admin access required)
  *     security:
  *       - bearerAuth: []

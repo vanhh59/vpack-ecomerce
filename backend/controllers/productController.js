@@ -4,7 +4,7 @@ import Product from "../models/productModel.js";
 const addProduct = asyncHandler(async (req, res) => {
   try {
     // Accessing data from req.body
-    const { name, description, price, category, quantity, brand, image } = req.body;
+    const { name, description, price, category, quantity, brand, image, image2 } = req.body;
 
     // Validation
     if (!name) {
@@ -38,6 +38,7 @@ const addProduct = asyncHandler(async (req, res) => {
       quantity,
       brand,
       image, // Include the image field
+      image2: image, // Include the image2 field
       countInStock: quantity // Assuming countInStock is initialized with quantity
     });
 
