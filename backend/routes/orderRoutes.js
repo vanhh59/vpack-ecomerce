@@ -7,7 +7,7 @@ import {
   getUserOrders,
   countTotalOrders,
   calculateTotalSales,
-  calcualteTotalSalesByDate,
+  calculateTotalSalesByDate,
   findOrderById,
   markOrderAsPaid,
   markOrderAsDelivered,
@@ -29,47 +29,38 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
  *           schema:
  *             type: object
  *             properties:
- *               orderItems:
+ *               products:
  *                 type: array
  *                 items:
  *                   type: object
  *                   properties:
- *                     _id:
+ *                     product:
  *                       type: string
  *                       description: "Enter the product ID"
- *                     qty:
+ *                     quantity:
  *                       type: integer
  *                       description: "Enter the quantity of the product"
  *               shippingAddress:
  *                 type: object
  *                 properties:
+ *                   name:
+ *                     type: string
+ *                   age:
+ *                     type: integer
  *                   address:
  *                     type: string
- *                   city:
+ *                   phoneNumber:
  *                     type: string
- *                   postalCode:
- *                     type: string
- *                   country:
- *                     type: string
- *               paymentMethod:
- *                 type: string
  *             example:
- *               orderItems: [
- *                 {
- *                   _id: "product_id_1",
- *                   qty: 20
- *                 },
- *                 {
- *                   _id: "product_id_2",
- *                   qty: 10
- *                 }
+ *               products: [
+ *                 { product: "product_id_1", quantity: 20 },
+ *                 { product: "product_id_2", quantity: 10 }
  *               ]
  *               shippingAddress:
+ *                 name: "John Doe"
+ *                 age: 30
  *                 address: "120 Long Thanh My HCM THU DUC"
- *                 city: "Ho Chi Minh"
- *                 postalCode: "12345"
- *                 country: "USA"
- *               paymentMethod: "Credit Card"
+ *                 phoneNumber: "1234567890"
  *     responses:
  *       201:
  *         description: Order created successfully
@@ -80,84 +71,7 @@ import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
  *       500:
  *         description: Internal server error
  */
-/**
- * @swagger
- * /api/orders:
- *   get:
- *     summary: Retrieve all orders
- *     description: Fetch all orders from the system. Only admins can access this route.
- *     tags: [Orders]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Successfully retrieved all orders
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   _id:
- *                     type: string
- *                   orderItems:
- *                     type: array
- *                     items:
- *                       type: object
- *                       properties:
- *                         product:
- *                           type: string
- *                         qty:
- *                           type: integer
- *                         price:
- *                           type: number
- *                   user:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: string
- *                       username:
- *                         type: string
- *                   shippingAddress:
- *                     type: object
- *                     properties:
- *                       address:
- *                         type: string
- *                       city:
- *                         type: string
- *                       postalCode:
- *                         type: string
- *                       country:
- *                         type: string
- *                   paymentMethod:
- *                     type: string
- *                   itemsPrice:
- *                     type: number
- *                   taxPrice:
- *                     type: number
- *                   shippingPrice:
- *                     type: number
- *                   totalPrice:
- *                     type: number
- *                   isPaid:
- *                     type: boolean
- *                   paidAt:
- *                     type: string
- *                   isDelivered:
- *                     type: boolean
- *                   deliveredAt:
- *                     type: string
- *       401:
- *         description: Unauthorized, admin access required
- *       500:
- *         description: Internal server error
- */
-
-router
-  .route("/")
-  .post(createOrder)
-  .get(getAllOrders);
+router.route("/").post(createOrder).get(authenticate, authorizeAdmin, getAllOrders);
 
 /**
  * @swagger
@@ -168,149 +82,121 @@ router
  *     tags: [Orders]
  *     responses:
  *       200:
- *         description: List of user's orders
+ *         description: List of user orders
  *       401:
- *         description: Unauthorized access
- *       500:
- *         description: Internal server error
+ *         description: Unauthorized
  */
-router.route("/mine").get(getUserOrders);
+router.route("/mine").get(authenticate, getUserOrders);
 
 /**
  * @swagger
- * /api/orders/total-orders:
+ * /api/orders/count:
  *   get:
- *     summary: Count total orders
- *     description: Returns the total number of orders in the system.
+ *     summary: Get total orders count
+ *     description: Returns total number of orders.
  *     tags: [Orders]
  *     responses:
  *       200:
- *         description: Total number of orders
- *       500:
- *         description: Internal server error
+ *         description: Total orders count
  */
-router.route("/total-orders").get(countTotalOrders);
+router.route("/count").get(authenticate, authorizeAdmin, countTotalOrders);
 
 /**
  * @swagger
  * /api/orders/total-sales:
  *   get:
- *     summary: Calculate total sales
- *     description: Returns the total sales amount for all orders.
+ *     summary: Get total sales amount
+ *     description: Returns total sales amount from all orders.
  *     tags: [Orders]
  *     responses:
  *       200:
  *         description: Total sales amount
- *       500:
- *         description: Internal server error
  */
-router.route("/total-sales").get(calculateTotalSales);
+router.route("/total-sales").get(authenticate, authorizeAdmin, calculateTotalSales);
 
 /**
  * @swagger
  * /api/orders/total-sales-by-date:
  *   get:
- *     summary: Calculate total sales by date
- *     description: Returns total sales grouped by date.
+ *     summary: Get total sales grouped by date
+ *     description: Returns total sales amount grouped by date.
  *     tags: [Orders]
  *     responses:
  *       200:
  *         description: Total sales by date
- *       500:
- *         description: Internal server error
  */
-router.route("/total-sales-by-date").get(calcualteTotalSalesByDate);
+router.route("/total-sales-by-date").get(authenticate, authorizeAdmin, calculateTotalSalesByDate);
 
 /**
  * @swagger
  * /api/orders/{id}:
  *   get:
  *     summary: Get order by ID
- *     description: Retrieves the details of a specific order by its ID.
+ *     description: Retrieves an order using its ID.
  *     tags: [Orders]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID of the order to retrieve
+ *         description: Order ID
  *         schema:
  *           type: string
  *     responses:
  *       200:
- *         description: Order details
+ *         description: Order found
  *       404:
  *         description: Order not found
  *       500:
  *         description: Internal server error
  */
-router.route("/:id").get(findOrderById);
+router.route("/:id").get(authenticate, findOrderById);
 
 /**
  * @swagger
  * /api/orders/{id}/pay:
  *   put:
  *     summary: Mark order as paid
- *     description: Updates the order status to paid.
+ *     description: Updates the order to reflect payment status.
  *     tags: [Orders]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID of the order to mark as paid
+ *         description: Order ID
  *         schema:
  *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               id:
- *                 type: string
- *               status:
- *                 type: string
- *               update_time:
- *                 type: string
- *               payer:
- *                 type: object
- *                 properties:
- *                   email_address:
- *                     type: string
  *     responses:
  *       200:
- *         description: Order marked as paid successfully
+ *         description: Order marked as paid
  *       404:
  *         description: Order not found
  *       500:
  *         description: Internal server error
  */
-router.route("/:id/pay").put(markOrderAsPaid);
+router.route("/:id/pay").put(authenticate, markOrderAsPaid);
 
 /**
  * @swagger
  * /api/orders/{id}/deliver:
  *   put:
  *     summary: Mark order as delivered
- *     description: Updates the order status to delivered.
+ *     description: Updates the order to reflect delivery status.
  *     tags: [Orders]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: ID of the order to mark as delivered
+ *         description: Order ID
  *         schema:
  *           type: string
  *     responses:
  *       200:
- *         description: Order marked as delivered successfully
+ *         description: Order marked as delivered
  *       404:
  *         description: Order not found
  *       500:
  *         description: Internal server error
  */
-router
-  .route("/:id/deliver")
-  .put(markOrderAsDelivered);
+router.route("/:id/deliver").put(authenticate, markOrderAsDelivered);
 
 export default router;
