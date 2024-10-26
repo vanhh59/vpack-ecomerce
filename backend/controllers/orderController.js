@@ -1,73 +1,45 @@
 import Order from "../models/orderModel.js";
 import Product from "../models/productModel.js";
 
-// Utility Function
-function calcPrices(orderItems) {
-  const itemsPrice = orderItems.reduce(
-    (acc, item) => acc + item.price * item.qty,
-    0
-  ); // reduce method to calculate total price of all items
-
-  const shippingPrice = itemsPrice > 100 ? 0 : 10; // 
-  const taxRate = 0.15;
-  const taxPrice = (itemsPrice * taxRate).toFixed(2);
-
-  const totalPrice = (
-    itemsPrice +
-    shippingPrice +
-    parseFloat(taxPrice)
-  ).toFixed(2);
-
-  return {
-    itemsPrice: itemsPrice.toFixed(2),
-    shippingPrice: shippingPrice.toFixed(2),
-    taxPrice,
-    totalPrice,
-  };
-}
-
+// Create Order
 const createOrder = async (req, res) => {
   try {
-    const { orderItems, shippingAddress, paymentMethod } = req.body;
+    const { products, shippingAddress, paymentMethod } = req.body;
 
-    if (orderItems && orderItems.length === 0) {
-      res.status(400);
-      throw new Error("No order items");
+    if (!products || products.length === 0) {
+      return res.status(400).json({ message: "No products specified" });
     }
 
-    const itemsFromDB = await Product.find({
-      _id: { $in: orderItems.map((x) => x._id) },
+    const productsFromDB = await Product.find({
+      _id: { $in: products.map((item) => item.product) },
     });
 
-    const dbOrderItems = orderItems.map((itemFromClient) => {
-      const matchingItemFromDB = itemsFromDB.find(
-        (itemFromDB) => itemFromDB._id.toString() === itemFromClient._id
+    const dbProducts = products.map((item) => {
+      const productFromDB = productsFromDB.find(
+        (dbProduct) => dbProduct._id.toString() === item.product
       );
 
-      if (!matchingItemFromDB) {
-        res.status(404);
-        throw new Error(`Product not found: ${itemFromClient._id}`);
+      if (!productFromDB) {
+        throw new Error(`Product not found: ${item.product}`);
       }
 
       return {
-        ...itemFromClient,
-        product: itemFromClient._id,
-        price: matchingItemFromDB.price,
-        _id: undefined,
+        product: item.product,
+        quantity: item.quantity,
+        price: productFromDB.price,
       };
     });
 
-    const { itemsPrice, taxPrice, shippingPrice, totalPrice } =
-      calcPrices(dbOrderItems);
+    const totalPrice = dbProducts.reduce(
+      (acc, item) => acc + item.price * item.quantity,
+      0
+    );
 
     const order = new Order({
-      orderItems: dbOrderItems,
-      user: req.user._id,
+      products: dbProducts,
+      user: req.user ? req.user._id : null,
       shippingAddress,
       paymentMethod,
-      itemsPrice,
-      taxPrice,
-      shippingPrice,
       totalPrice,
     });
 
@@ -78,6 +50,7 @@ const createOrder = async (req, res) => {
   }
 };
 
+// Get All Orders
 const getAllOrders = async (req, res) => {
   try {
     const orders = await Order.find({}).populate("user", "id username");
@@ -87,6 +60,7 @@ const getAllOrders = async (req, res) => {
   }
 };
 
+// Get Orders for Logged-in User
 const getUserOrders = async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user._id });
@@ -96,6 +70,7 @@ const getUserOrders = async (req, res) => {
   }
 };
 
+// Count Total Orders
 const countTotalOrders = async (req, res) => {
   try {
     const totalOrders = await Order.countDocuments();
@@ -103,8 +78,9 @@ const countTotalOrders = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}; // countDocuments method to count total orders
+};
 
+// Calculate Total Sales
 const calculateTotalSales = async (req, res) => {
   try {
     const orders = await Order.find();
@@ -113,9 +89,10 @@ const calculateTotalSales = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}; // reduce method to calculate total sales
+};
 
-const calcualteTotalSalesByDate = async (req, res) => {
+// Calculate Sales by Date
+const calculateTotalSalesByDate = async (req, res) => {
   try {
     const salesByDate = await Order.aggregate([
       {
@@ -137,28 +114,24 @@ const calcualteTotalSalesByDate = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}; // aggregate method to group orders by date and calculate total sales
+};
 
+// Find Order by ID
 const findOrderById = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate(
-      "user",
-      "username email"
-    );
-    // populate user field with username and email 
+    const order = await Order.findById(req.params.id).populate("user", "username email");
 
     if (order) {
       res.json(order);
     } else {
-      res.status(404);
-      throw new Error("Order not found");
+      res.status(404).json({ message: "Order not found" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
-// markOrderAsPaid function to update order as paid
+// Mark Order as Paid
 const markOrderAsPaid = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -166,24 +139,17 @@ const markOrderAsPaid = async (req, res) => {
     if (order) {
       order.isPaid = true;
       order.paidAt = Date.now();
-      order.paymentResult = {
-        id: req.body.id,
-        status: req.body.status,
-        update_time: req.body.update_time,
-        email_address: req.body.payer.email_address,
-      };
-
-      const updateOrder = await order.save();
-      res.status(200).json(updateOrder);
+      const updatedOrder = await order.save();
+      res.status(200).json(updatedOrder);
     } else {
-      res.status(404);
-      throw new Error("Order not found");
+      res.status(404).json({ message: "Order not found" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
 
+// Mark Order as Delivered
 const markOrderAsDelivered = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -191,12 +157,10 @@ const markOrderAsDelivered = async (req, res) => {
     if (order) {
       order.isDelivered = true;
       order.deliveredAt = Date.now();
-
       const updatedOrder = await order.save();
       res.json(updatedOrder);
     } else {
-      res.status(404);
-      throw new Error("Order not found");
+      res.status(404).json({ message: "Order not found" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -209,7 +173,7 @@ export {
   getUserOrders,
   countTotalOrders,
   calculateTotalSales,
-  calcualteTotalSalesByDate,
+  calculateTotalSalesByDate,
   findOrderById,
   markOrderAsPaid,
   markOrderAsDelivered,
