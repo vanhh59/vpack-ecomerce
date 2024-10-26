@@ -3,30 +3,51 @@ import Product from "../models/productModel.js";
 
 const addProduct = asyncHandler(async (req, res) => {
   try {
-    const { name, description, price, category, quantity, brand } = req.fields;
+    // Accessing data from req.body
+    const { name, description, price, category, quantity, brand, image } = req.body;
 
     // Validation
-    switch (true) {
-      case !name:
-        return res.json({ error: "Name is required" });
-      case !brand:
-        return res.json({ error: "Brand is required" });
-      case !description:
-        return res.json({ error: "Description is required" });
-      case !price:
-        return res.json({ error: "Price is required" });
-      case !category:
-        return res.json({ error: "Category is required" });
-      case !quantity:
-        return res.json({ error: "Quantity is required" });
+    if (!name) {
+      return res.status(400).json({ error: "Name is required" });
+    }
+    if (!brand) {
+      return res.status(400).json({ error: "Brand is required" });
+    }
+    if (!description) {
+      return res.status(400).json({ error: "Description is required" });
+    }
+    if (price === undefined) { // Check for undefined, since price can be 0
+      return res.status(400).json({ error: "Price is required" });
+    }
+    if (!category) {
+      return res.status(400).json({ error: "Category is required" });
+    }
+    if (quantity === undefined) { // Check for undefined, since quantity can be 0
+      return res.status(400).json({ error: "Quantity is required" });
+    }
+    if (!image) { // Validate that image is provided
+      return res.status(400).json({ error: "Image URL is required" });
     }
 
-    const product = new Product({ ...req.fields });
+    // Create and save the new product
+    const product = new Product({
+      name,
+      description,
+      price,
+      category,
+      quantity,
+      brand,
+      image, // Include the image field
+      countInStock: quantity // Assuming countInStock is initialized with quantity
+    });
+
     await product.save();
-    res.json(product);
+
+    // Respond with the created product
+    res.status(201).json(product);
   } catch (error) {
     console.error(error);
-    res.status(400).json(error.message);
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -77,31 +98,39 @@ const removeProduct = asyncHandler(async (req, res) => {
 
 const fetchProducts = asyncHandler(async (req, res) => {
   try {
-    const pageSize = 6;
-
+    // Extract keyword and category from query parameters
     const keyword = req.query.keyword
       ? {
-        name: {
-          $regex: req.query.keyword,
-          $options: "i",
-        },
-      }
+          name: {
+            $regex: req.query.keyword.trim(),
+            $options: "i",
+          },
+        }
       : {};
 
-    const count = await Product.countDocuments({ ...keyword });
-    const products = await Product.find({ ...keyword }).limit(pageSize);
+    const categoryFilter = req.query.category ? { category: req.query.category } : {};
+
+    // Combine filters
+    const filters = { ...keyword, ...categoryFilter };
+
+    const products = await Product.find(filters).populate({
+      path: "category",
+      select: "name",
+    });
+
+    const formattedProducts = products.map(product => ({
+      ...product.toObject(),
+      category: product.category.name,
+    }));
 
     res.json({
-      products,
-      page: 1,
-      pages: Math.ceil(count / pageSize),
-      hasMore: false,
+      products: formattedProducts,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server Error" });
   }
-});  // hàm này trả về một danh sách sản phẩm dựa trên từ khóa tìm kiếm và số lượng sản phẩm trên mỗi trang
+});
 
 const fetchProductById = asyncHandler(async (req, res) => {
   try {
@@ -121,10 +150,19 @@ const fetchProductById = asyncHandler(async (req, res) => {
 const fetchAllProducts = asyncHandler(async (req, res) => {
   try {
     const products = await Product.find({})
-      .populate("category")
-      .sort({ createAt: -1 });
+      .populate({
+        path: 'category',
+        select: 'name',
+      })
+      .limit(12)
+      .sort({ createdAt: -1 });
 
-    res.json(products);
+    const formattedProducts = products.map(product => ({
+      ...product.toObject(), 
+      category: product.category.name
+    }));
+
+    res.json(formattedProducts);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server Error" });
@@ -175,8 +213,20 @@ const addProductReview = asyncHandler(async (req, res) => {
 
 const fetchTopProducts = asyncHandler(async (req, res) => {
   try {
-    const products = await Product.find({}).sort({ rating: -1 }).limit(4);
-    res.json(products);
+    const products = await Product.find({})
+      .populate({
+        path: 'category',
+        select: 'name',
+      })
+      .sort({ rating: -1 })
+      .limit(4);
+    
+    const formattedProducts = products.map(product => ({
+      ...product.toObject(), 
+      category: product.category.name
+    }));
+
+    res.json(formattedProducts);
   } catch (error) {
     console.error(error);
     res.status(400).json(error.message);

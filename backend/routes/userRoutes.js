@@ -136,7 +136,7 @@ router.post("/logout", logoutCurrentUser);
  *      500:
  *        description: Server error
  */
-router.get("/", authenticate, authorizeAdmin, getAllUsers);
+router.get("/", authenticate, getAllUsers);
 
 /**
  * @openapi
@@ -285,8 +285,8 @@ router.route("/profile")
  */
 router
   .route("/:id")
-  .delete(authenticate, authorizeAdmin, deleteUserById)
-  .get(authenticate, authorizeAdmin, getUserById)
-  .put(authenticate, authorizeAdmin, updateUserById);
+  .delete(authenticate, deleteUserById)
+  .get(authenticate, getUserById)
+  .put(authenticate, updateUserById);
 
 export default router;

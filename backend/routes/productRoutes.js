@@ -15,7 +15,6 @@ import {
   fetchNewProducts,
   filterProducts,
 } from "../controllers/productController.js";
-import { authenticate, authorizeAdmin } from "../middlewares/authMiddleware.js";
 import checkId from "../middlewares/checkId.js";
 
 
@@ -31,7 +30,7 @@ import checkId from "../middlewares/checkId.js";
  *     requestBody:
  *       required: true
  *       content:
- *         multipart/form-data:
+ *         application/json:  # Changed to application/json
  *           schema:
  *             type: object
  *             properties:
@@ -61,8 +60,8 @@ import checkId from "../middlewares/checkId.js";
  *                 example: 18
  *               image:
  *                 type: string
- *                 example: Url
- *                 description: Image file for the product
+ *                 description: Image URL for the product
+ *                 example: http://example.com/image.jpg
  *     responses:
  *       201:
  *         description: Product created successfully
@@ -75,72 +74,80 @@ import checkId from "../middlewares/checkId.js";
  */
 router.route("/").post(addProduct);
 
-
 /**
  * @openapi
  * /api/products:
  *   get:
  *     tags:
  *       - Products
- *     summary: Fetch all products with optional filters
+ *     summary: Fetch all products
+ *     description: Retrieve a list of products, optionally filtered by keyword and category.
  *     parameters:
- *       - name: category
- *         in: query
- *         description: Filter products by category ID
+ *       - in: query
+ *         name: keyword
  *         required: false
  *         schema:
  *           type: string
- *       - name: brand
- *         in: query
- *         description: Filter products by brand name
+ *         description: Search keyword to filter products by name.
+ *       - in: query
+ *         name: category
  *         required: false
  *         schema:
  *           type: string
- *       - name: minPrice
- *         in: query
- *         description: Minimum price filter
- *         required: false
- *         schema:
- *           type: number
- *       - name: maxPrice
- *         in: query
- *         description: Maximum price filter
- *         required: false
- *         schema:
- *           type: number
+ *         description: Category ID to filter products.
  *     responses:
  *       200:
- *         description: Products retrieved successfully
+ *         description: A list of products
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   _id:
- *                     type: string
- *                     description: The unique identifier for the product
- *                   name:
- *                     type: string
- *                     description: The name of the product
- *                   brand:
- *                     type: string
- *                     description: The brand of the product
- *                   price:
- *                     type: number
- *                     description: The price of the product
- *                   category:
- *                     type: string
- *                     description: The category ID of the product
- *                   quantity:
- *                     type: number
- *                     description: The available quantity of the product
- *                   image:
- *                     type: string
- *                     description: The URL of the product image
+ *               type: object
+ *               properties:
+ *                 products:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                         description: The unique identifier for the product
+ *                       name:
+ *                         type: string
+ *                         description: The name of the product
+ *                       brand:
+ *                         type: string
+ *                         description: The brand of the product
+ *                       description:
+ *                         type: string
+ *                         description: The description of the product
+ *                       price:
+ *                         type: number
+ *                         description: The price of the product
+ *                       quantity:
+ *                         type: number
+ *                         description: The quantity available in stock
+ *                       category:
+ *                         type: string
+ *                         description: The name of the category
+ *                       image:
+ *                         type: string
+ *                         description: URL of the product image
+ *                       rating:
+ *                         type: number
+ *                         description: The average rating of the product
+ *                       numReviews:
+ *                         type: number
+ *                         description: The number of reviews for the product
  *       500:
- *         description: Server error
+ *         description: Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Error message
  */
 router.route("/").get(fetchProducts);
 

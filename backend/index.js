@@ -15,7 +15,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js"; // Import blog routes
 
 dotenv.config();
-const port = process.env.PORT || 10000;
+const port = process.env.PORT ;
 
 connectDB();
 
