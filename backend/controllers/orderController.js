@@ -4,16 +4,19 @@ import Product from "../models/productModel.js";
 // Create Order
 const createOrder = async (req, res) => {
   try {
-    const { products, shippingAddress, paymentMethod } = req.body;
+    const { staff, products, shippingAddress, paymentMethod } = req.body;
 
+    // Validate input
     if (!products || products.length === 0) {
       return res.status(400).json({ message: "No products specified" });
     }
 
+    // Fetch products from the database
     const productsFromDB = await Product.find({
       _id: { $in: products.map((item) => item.product) },
     });
 
+    // Map the products to include necessary details
     const dbProducts = products.map((item) => {
       const productFromDB = productsFromDB.find(
         (dbProduct) => dbProduct._id.toString() === item.product
@@ -24,28 +27,33 @@ const createOrder = async (req, res) => {
       }
 
       return {
-        product: item.product,
+        product: item.product, // Product ID
+        name: productFromDB.name, // Get name from the database
         quantity: item.quantity,
         price: productFromDB.price,
       };
     });
 
+    // Calculate total price
     const totalPrice = dbProducts.reduce(
       (acc, item) => acc + item.price * item.quantity,
       0
     );
 
+    // Create a new order
     const order = new Order({
       products: dbProducts,
-      user: req.user ? req.user._id : null,
+      staff,
       shippingAddress,
       paymentMethod,
       totalPrice,
     });
 
+    // Save the order to the database
     const createdOrder = await order.save();
     res.status(201).json(createdOrder);
   } catch (error) {
+    // Return structured error response
     res.status(500).json({ error: error.message });
   }
 };
@@ -53,10 +61,36 @@ const createOrder = async (req, res) => {
 // Get All Orders
 const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find({}).populate("user", "id username");
-    res.json(orders);
+      // Fetch all orders and populate the product field
+      const orders = await Order.find({})
+          .populate({
+              path: 'products.product', // Assuming products is an array of objects with a 'product' field
+              select: 'name _id' // Select only name and _id
+          })
+          .exec();
+
+      // Format the orders to include only necessary fields
+      const formattedOrders = orders.map(order => ({
+          _id: order._id,
+          staff: order.staff,
+          shippingAddress: order.shippingAddress,
+          paymentMethod: order.paymentMethod,
+          totalPrice: order.totalPrice,
+          isPaid: order.isPaid,
+          isDelivered: order.isDelivered,
+          createdAt: order.createdAt,
+          updatedAt: order.updatedAt,
+          products: order.products.map(product => ({
+              product: product.product._id, // Product ID
+              name: product.product.name, // Product name
+              quantity: product.quantity,
+              price: product.price
+          }))
+      }));
+
+      res.json(formattedOrders);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+      res.status(500).json({ error: error.message });
   }
 };
 
@@ -116,16 +150,41 @@ const calculateTotalSalesByDate = async (req, res) => {
   }
 };
 
-// Find Order by ID
 const findOrderById = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id).populate("user", "username email");
+    // Fetch the order by ID and populate the product details
+    const order = await Order.findById(req.params.id)
+      .populate({
+        path: 'products.product', // Assuming products is an array of objects with a 'product' field
+        select: 'name _id' // Select only name and _id
+      })
+      .exec();
 
-    if (order) {
-      res.json(order);
-    } else {
-      res.status(404).json({ message: "Order not found" });
+    // Check if the order was found
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
     }
+
+    // Format the order to include only necessary fields
+    const formattedOrder = {
+      _id: order._id,
+      staff: order.staff,
+      shippingAddress: order.shippingAddress,
+      paymentMethod: order.paymentMethod,
+      totalPrice: order.totalPrice,
+      isPaid: order.isPaid,
+      isDelivered: order.isDelivered,
+      createdAt: order.createdAt,
+      updatedAt: order.updatedAt,
+      products: order.products.map(product => ({
+        product: product.product._id, // Product ID
+        name: product.product.name, // Product name
+        quantity: product.quantity,
+        price: product.price
+      }))
+    };
+
+    res.json(formattedOrder);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -167,6 +226,21 @@ const markOrderAsDelivered = async (req, res) => {
   }
 };
 
+const deleteOrderById = async (req, res) => {
+  try {
+    // Use findByIdAndDelete to find and remove the order in one step
+    const order = await Order.findByIdAndDelete(req.params.id);
+
+    if (order) {
+      res.json({ message: "Order removed" });
+    } else {
+      res.status(404).json({ message: "Order not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 export {
   createOrder,
   getAllOrders,
@@ -177,4 +251,5 @@ export {
   findOrderById,
   markOrderAsPaid,
   markOrderAsDelivered,
+  deleteOrderById,
 };

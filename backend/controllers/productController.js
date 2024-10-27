@@ -146,7 +146,7 @@ const fetchProductById = asyncHandler(async (req, res) => {
     console.error(error);
     res.status(404).json({ error: "Product not found" });
   }
-}); // hàm này trả về một sản phẩm dựa trên id
+});
 
 const fetchAllProducts = asyncHandler(async (req, res) => {
   try {
@@ -236,8 +236,18 @@ const fetchTopProducts = asyncHandler(async (req, res) => {
 
 const fetchNewProducts = asyncHandler(async (req, res) => {
   try {
-    const products = await Product.find().sort({ _id: -1 }).limit(5);
-    res.json(products);
+    const products = await Product.find()
+    .populate({
+      path: 'category',
+      select: 'name',
+    })
+    .sort({ _id: -1 }).limit(5);
+    const formattedProducts = products.map(product => ({
+      ...product.toObject(), 
+      category: product.category.name
+    }));
+
+    res.json(formattedProducts);
   } catch (error) {
     console.error(error);
     res.status(400).json(error.message);
