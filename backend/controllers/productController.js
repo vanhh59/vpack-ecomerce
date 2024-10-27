@@ -54,36 +54,45 @@ const addProduct = asyncHandler(async (req, res) => {
 
 const updateProductDetails = asyncHandler(async (req, res) => {
   try {
-    const { name, description, price, category, quantity, brand } = req.fields;
+    const { name, description, price, category, quantity, brand } = req.body; // Use req.body instead of req.fields
 
     // Validation
-    switch (true) {
-      case !name:
-        return res.json({ error: "Name is required" });
-      case !brand:
-        return res.json({ error: "Brand is required" });
-      case !description:
-        return res.json({ error: "Description is required" });
-      case !price:
-        return res.json({ error: "Price is required" });
-      case !category:
-        return res.json({ error: "Category is required" });
-      case !quantity:
-        return res.json({ error: "Quantity is required" });
+    if (!name) {
+      return res.status(400).json({ error: "Name is required" });
+    }
+    if (!brand) {
+      return res.status(400).json({ error: "Brand is required" });
+    }
+    if (!description) {
+      return res.status(400).json({ error: "Description is required" });
+    }
+    if (price === undefined) { // Check for undefined, since price can be 0
+      return res.status(400).json({ error: "Price is required" });
+    }
+    if (!category) {
+      return res.status(400).json({ error: "Category is required" });
+    }
+    if (quantity === undefined) { // Check for undefined, since quantity can be 0
+      return res.status(400).json({ error: "Quantity is required" });
     }
 
+    // Update the product
     const product = await Product.findByIdAndUpdate(
       req.params.id,
-      { ...req.fields },
-      { new: true }
+      { name, description, price, category, quantity, brand }, // Use only the fields that need to be updated
+      { new: true, runValidators: true } // Options: new returns the updated document, runValidators ensures validation
     );
 
-    await product.save();
+    // Check if the product was found
+    if (!product) {
+      return res.status(404).json({ error: "Product not found" });
+    }
 
+    // Respond with the updated product
     res.json(product);
   } catch (error) {
     console.error(error);
-    res.status(400).json(error.message);
+    res.status(500).json({ error: error.message });
   }
 });
 

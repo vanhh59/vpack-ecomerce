@@ -322,9 +322,56 @@ router.get("/new", fetchNewProducts);
  *                 type: number
  *               image:
  *                 type: string
+ *               image2:
+ *                 type: string
+ *             required:
+ *               - name
+ *               - brand
+ *               - description
+ *               - price
+ *               - category
+ *               - quantity
+ *               - image
+ *           example:
+ *             name: "Thẻ đeo dây Đinh Bộ Lĩnh"
+ *             brand: "Vipack"
+ *             description: "Lấy cảm hứng từ vị tướng cờ lau, người đã làm nên một nước Việt thống nhất, bộ sưu tập này không chỉ thể hiện tình yêu lịch sử, mà còn tôn vinh bản lĩnh oai hùng của dân tộc. Mỗi chiếc dây đeo thẻ đều là một lời tuyên ngôn lịch sử, một cách thể hiện đam mê mà bạn có thể đeo trên mình!"
+ *             price: 100000
+ *             category: "671de6b69c6278fcbe330573"
+ *             quantity: 1000
+ *             image: "https://firebasestorage.googleapis.com/v0/b/vipack-project.appspot.com/o/products-image1%2FIMG_0042.jpg?alt=media&token=707eac97-db3c-40e5-a6fd-ffff40e7dea3"
+ *             image2: "https://firebasestorage.googleapis.com/v0/b/vipack-project.appspot.com/o/products-image1%2FIMG_0042.jpg?alt=media&token=707eac97-db3c-40e5-a6fd-ffff40e7dea3"
  *     responses:
  *       200:
  *         description: Product updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 product:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *                     brand:
+ *                       type: string
+ *                     description:
+ *                       type: string
+ *                     price:
+ *                       type: number
+ *                     category:
+ *                       type: string
+ *                     quantity:
+ *                       type: number
+ *                     image:
+ *                       type: string
+ *                     image2:
+ *                       type: string
  *       400:
  *         description: Bad request
  *       404:
