@@ -12,7 +12,7 @@ import {
   markOrderAsPaid,
   markOrderAsDelivered,
   deleteOrderById,
-} from "../controllers/orderController.js";
+} from '../controllers/orderController.js';
 
 /**
  * @swagger
@@ -74,6 +74,7 @@ import {
  *                 address: "120 Long Thanh My HCM THU DUC"
  *                 phoneNumber: "1234567890"
  *               paymentMethod: "VN Pay"
+ *               description: "Thanh toán dây đeo"
  *     responses:
  *       201:
  *         description: Order created successfully
@@ -85,102 +86,102 @@ import {
  *         description: Internal server error
  */
 router.route("/")
-.post(createOrder)
+  .post(createOrder)
 
-/**
- * @swagger
- * /api/orders:
- *   get:
- *     summary: Retrieve all orders
- *     description: Returns a list of all orders with their details.
- *     tags: [Orders]
- *     responses:
- *       200:
- *         description: A list of orders
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   _id:
- *                     type: string
- *                     description: "The unique identifier for the order."
- *                   staff:
- *                     type: string
- *                     description: "Staff ID or name who created the order."
- *                   shippingAddress:
- *                     type: object
- *                     properties:
- *                       name:
- *                         type: string
- *                       age:
- *                         type: integer
- *                       address:
- *                         type: string
- *                       phoneNumber:
- *                         type: string
- *                   paymentMethod:
- *                     type: string
- *                     description: "Payment method used for the order."
- *                   totalPrice:
- *                     type: integer
- *                     description: "Total price of the order."
- *                   isPaid:
- *                     type: boolean
- *                     description: "Indicates if the order has been paid."
- *                   isDelivered:
- *                     type: boolean
- *                     description: "Indicates if the order has been delivered."
- *                   createdAt:
- *                     type: string
- *                     format: date-time
- *                     description: "Date and time when the order was created."
- *                   updatedAt:
- *                     type: string
- *                     format: date-time
- *                     description: "Date and time when the order was last updated."
- *                   products:
- *                     type: array
- *                     items:
- *                       type: object
- *                       properties:
- *                         product:
- *                           type: string
- *                           description: "The ID of the product."
- *                         name:
- *                           type: string
- *                           description: "The name of the product."
- *                         quantity:
- *                           type: integer
- *                           description: "The quantity of the product ordered."
- *                         price:
- *                           type: integer
- *                           description: "The price of the product."
- *             example:
- *               - _id: "671df94c9279f5699d9bc3c5"
- *                 staff: "Nhan vien quan li order"
- *                 shippingAddress:
- *                   name: "Ten Khach Hang"
- *                   age: 30
- *                   address: "120 Long Thanh My HCM THU DUC"
- *                   phoneNumber: "1234567890"
- *                 paymentMethod: "VN Pay"
- *                 totalPrice: 1980000
- *                 isPaid: false
- *                 isDelivered: false
- *                 createdAt: "2024-10-27T08:26:52.320Z"
- *                 updatedAt: "2024-10-27T08:26:52.320Z"
- *                 products:
- *                   - product: "671de826ba4c156250c6c494"
- *                     name: "Thẻ đeo dây Đinh Bộ Lĩnh"
- *                     quantity: 20
- *                     price: 99000
- *       500:
- *         description: Internal server error
- */
-.get(getAllOrders);
+  /**
+   * @swagger
+   * /api/orders:
+   *   get:
+   *     summary: Retrieve all orders
+   *     description: Returns a list of all orders with their details.
+   *     tags: [Orders]
+   *     responses:
+   *       200:
+   *         description: A list of orders
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                 type: object
+   *                 properties:
+   *                   _id:
+   *                     type: string
+   *                     description: "The unique identifier for the order."
+   *                   staff:
+   *                     type: string
+   *                     description: "Staff ID or name who created the order."
+   *                   shippingAddress:
+   *                     type: object
+   *                     properties:
+   *                       name:
+   *                         type: string
+   *                       age:
+   *                         type: integer
+   *                       address:
+   *                         type: string
+   *                       phoneNumber:
+   *                         type: string
+   *                   paymentMethod:
+   *                     type: string
+   *                     description: "Payment method used for the order."
+   *                   totalPrice:
+   *                     type: integer
+   *                     description: "Total price of the order."
+   *                   isPaid:
+   *                     type: boolean
+   *                     description: "Indicates if the order has been paid."
+   *                   isDelivered:
+   *                     type: boolean
+   *                     description: "Indicates if the order has been delivered."
+   *                   createdAt:
+   *                     type: string
+   *                     format: date-time
+   *                     description: "Date and time when the order was created."
+   *                   updatedAt:
+   *                     type: string
+   *                     format: date-time
+   *                     description: "Date and time when the order was last updated."
+   *                   products:
+   *                     type: array
+   *                     items:
+   *                       type: object
+   *                       properties:
+   *                         product:
+   *                           type: string
+   *                           description: "The ID of the product."
+   *                         name:
+   *                           type: string
+   *                           description: "The name of the product."
+   *                         quantity:
+   *                           type: integer
+   *                           description: "The quantity of the product ordered."
+   *                         price:
+   *                           type: integer
+   *                           description: "The price of the product."
+   *             example:
+   *               - _id: "671df94c9279f5699d9bc3c5"
+   *                 staff: "Nhan vien quan li order"
+   *                 shippingAddress:
+   *                   name: "Ten Khach Hang"
+   *                   age: 30
+   *                   address: "120 Long Thanh My HCM THU DUC"
+   *                   phoneNumber: "1234567890"
+   *                 paymentMethod: "VN Pay"
+   *                 totalPrice: 1980000
+   *                 isPaid: false
+   *                 isDelivered: false
+   *                 createdAt: "2024-10-27T08:26:52.320Z"
+   *                 updatedAt: "2024-10-27T08:26:52.320Z"
+   *                 products:
+   *                   - product: "671de826ba4c156250c6c494"
+   *                     name: "Thẻ đeo dây Đinh Bộ Lĩnh"
+   *                     quantity: 20
+   *                     price: 99000
+   *       500:
+   *         description: Internal server error
+   */
+  .get(getAllOrders);
 
 /**
  * @swagger

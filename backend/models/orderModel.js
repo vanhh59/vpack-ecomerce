@@ -41,6 +41,11 @@ const orderSchema = mongoose.Schema(
     deliveredAt: {
       type: Date,
     },
+    description: {
+      type: String,
+      maxlength: 255, // Adjust the maximum length as needed
+      default: "", // Optional: set a default value if desired
+    },
   },
   {
     timestamps: true,
