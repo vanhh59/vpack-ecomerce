@@ -16,10 +16,10 @@ const options = {
             version: '1.0.0',
         },
         servers: [
-            {
-                url: "https://vpack-ecomerce.onrender.com/",
-                description: "Live server"
-            },
+            // {
+            //     url: "https://vpack-ecomerce.onrender.com/",
+            //     description: "Live server"
+            // },
             {
                 url: "http://localhost:8082/",
                 description: "Local server"

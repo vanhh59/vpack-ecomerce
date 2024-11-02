@@ -13,7 +13,7 @@ import productRoutes from "./routes/productRoutes.js"; // Nhập khẩu productR
 import uploadRoutes from "./routes/uploadRoutes.js"; // Nhập khẩu uploadRoutes
 import orderRoutes from "./routes/orderRoutes.js"; // Nhập khẩu orderRoutes
 import blogRoutes from "./routes/blogRoutes.js"; // Nhập khẩu blogRoutes
-
+import blogDetailRoutes from "./routes/blogDetailRoutes.js"; // Nhập khẩu blogDetailRoutes
 import PayOS from "@payos/node"; // Thay thế require bằng import
 dotenv.config(); // Tải biến môi trường từ .env
 
@@ -43,6 +43,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/blogs", blogRoutes); // Sử dụng blog routes
+app.use("/api/design-details", blogDetailRoutes); // Sử dụng blog detail routes
 
 app.get("/api/config/paypal", (req, res) => {
   res.send({ clientId: process.env.PAYPAL_CLIENT_ID });
@@ -53,5 +54,5 @@ const __dirname = path.resolve();
 app.use("/uploads", express.static(path.join(__dirname + "/uploads")));
 
 // Khởi động server
-app.listen(port, () => console.log(`Server running on http://localhost:${port}/api/users`));
+app.listen(port, () => console.log(`Swagger API running on http://localhost:${port}/docs`));
 swaggerDocs(app, port); // Khởi tạo Swagger documentation
