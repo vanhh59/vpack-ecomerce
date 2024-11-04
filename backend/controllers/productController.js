@@ -1,6 +1,6 @@
 import asyncHandler from "../middlewares/asyncHandler.js";
 import Product from "../models/productModel.js";
-
+import Category from "../models/categoryModel.js";
 const addProduct = asyncHandler(async (req, res) => {
   try {
     // Accessing data from req.body
@@ -27,6 +27,12 @@ const addProduct = asyncHandler(async (req, res) => {
     }
     if (!image) { // Validate that image is provided
       return res.status(400).json({ error: "Image URL is required" });
+    }
+
+    // Check if the category exists
+    const categoryExists = await Category.findById(category);
+    if (!categoryExists) {
+      return res.status(400).json({ error: "Invalid category. Category does not exist." });
     }
 
     // Create and save the new product
