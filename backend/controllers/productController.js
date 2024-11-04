@@ -105,7 +105,7 @@ const updateProductDetails = asyncHandler(async (req, res) => {
 const removeProduct = asyncHandler(async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
-    res.json(product);
+    res.json({ message: "Product removed" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server error" });
