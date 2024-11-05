@@ -1,6 +1,7 @@
 import asyncHandler from "../middlewares/asyncHandler.js";
 import Product from "../models/productModel.js";
 import Category from "../models/categoryModel.js";
+
 const addProduct = asyncHandler(async (req, res) => {
   try {
     // Accessing data from req.body
@@ -60,33 +61,58 @@ const addProduct = asyncHandler(async (req, res) => {
 
 const updateProductDetails = asyncHandler(async (req, res) => {
   try {
-    const { name, description, price, category, quantity, brand } = req.body; // Use req.body instead of req.fields
+    const { name, description, price, category, quantity, brand, image, image2 } = req.body;
 
-    // Validation
-    if (!name) {
+    // Validation for mandatory fields if they are included in the update
+    if (name !== undefined && !name) {
       return res.status(400).json({ error: "Name is required" });
     }
-    if (!brand) {
+    if (brand !== undefined && !brand) {
       return res.status(400).json({ error: "Brand is required" });
     }
-    if (!description) {
+    if (description !== undefined && !description) {
       return res.status(400).json({ error: "Description is required" });
     }
-    if (price === undefined) { // Check for undefined, since price can be 0
+    if (price !== undefined && price === null) { // Ensure price isn't null if provided
       return res.status(400).json({ error: "Price is required" });
     }
-    if (!category) {
+    if (category !== undefined && !category) {
       return res.status(400).json({ error: "Category is required" });
     }
-    if (quantity === undefined) { // Check for undefined, since quantity can be 0
+    if (quantity !== undefined && quantity === null) { // Ensure quantity isn't null if provided
       return res.status(400).json({ error: "Quantity is required" });
     }
+    if (image !== undefined && !image) {
+      return res.status(400).json({ error: "Image URL is required" });
+    }
+    if (image2 !== undefined && !image2) {
+      return res.status(400).json({ error: "Secondary image URL is required" });
+    }
+
+    // Check if the category exists if it’s included in the update
+    if (category) {
+      const categoryExists = await Category.findById(category);
+      if (!categoryExists) {
+        return res.status(400).json({ error: "Invalid category. Category does not exist." });
+      }
+    }
+
+    // Build update object with only the fields provided in req.body
+    const updateFields = {};
+    if (name !== undefined) updateFields.name = name;
+    if (description !== undefined) updateFields.description = description;
+    if (price !== undefined) updateFields.price = price;
+    if (category !== undefined) updateFields.category = category;
+    if (quantity !== undefined) updateFields.quantity = quantity;
+    if (brand !== undefined) updateFields.brand = brand;
+    if (image !== undefined) updateFields.image = image;
+    if (image2 !== undefined) updateFields.image2 = image2;
 
     // Update the product
     const product = await Product.findByIdAndUpdate(
       req.params.id,
-      { name, description, price, category, quantity, brand }, // Use only the fields that need to be updated
-      { new: true, runValidators: true } // Options: new returns the updated document, runValidators ensures validation
+      updateFields,
+      { new: true, runValidators: true } // Return updated document, validate fields
     );
 
     // Check if the product was found
