@@ -59,7 +59,7 @@ export const getBlogDetailById = async (req, res) => {
 export const getBlogDetailByBlogId = async (req, res) => {
     try {
         const { id } = req.params;
-        const blogDetail = await BlogDetail.find( Blog.id );
+        const blogDetail = await BlogDetail.find({ blogId: id });
 
         if (!blogDetail) {
             return res.status(404).json({ message: "Blog detail not found" });
